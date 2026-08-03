@@ -2,826 +2,1248 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Magic Nexus – Visor de Torneo</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5" />
+  <title>MTM · Visualizador de Torneo</title>
+  <!-- Google Fonts (mismas que MTM) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,700;14..32,900&family=Montserrat:ital,wght@0,400;0,700;0,900;1,900&display=swap" rel="stylesheet" />
+  <!-- Font Awesome para iconos -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ========================================
+       ESTILOS BASE (similar a MTM pero compacto)
+       ======================================== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --color-bg: #0a0a0f;
+      --color-surface: #14141e;
+      --color-surface-hover: #1e1e2f;
+      --color-text: #e2e8f0;
+      --color-text-muted: #94a3b8;
+      --color-border: #2d2d44;
+      --neon-purple: #a855f7;
+      --neon-cyan: #22d3ee;
+      --neon-pink: #ec4899;
+      --neon-green: #4ade80;
+      --neon-yellow: #facc15;
+      --neon-red: #f87171;
+      --shadow-glow: 0 0 20px rgba(168, 85, 247, 0.15);
+      --radius: 12px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--color-bg);
+      color: var(--color-text);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--color-border);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--neon-purple);
+    }
+
+    /* ========================================
+       LAYOUT PRINCIPAL
+       ======================================== */
+    .app {
+      display: flex;
+      min-height: 100vh;
+      background: var(--color-bg);
+    }
+
+    /* SIDEBAR (PC) */
+    .sidebar {
+      width: 220px;
+      background: rgba(10, 10, 15, 0.95);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      transition: transform 0.3s ease;
+      z-index: 100;
+    }
+
+    .sidebar-brand {
+      padding: 1.2rem 1rem 0.8rem;
+      border-bottom: 1px solid var(--color-border);
+      text-align: center;
+    }
+    .sidebar-brand h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 900;
+      font-style: italic;
+      letter-spacing: -0.5px;
+    }
+    .sidebar-brand h1 span {
+      color: var(--neon-purple);
+    }
+    .sidebar-brand small {
+      display: block;
+      font-size: 0.55rem;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 0.2rem;
+    }
+
+    .sidebar-nav {
+      flex: 1;
+      padding: 0.5rem 0.3rem;
+      overflow-y: auto;
+    }
+
+    .sidebar-nav .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.6rem 0.8rem;
+      border-radius: var(--radius);
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      border-left: 3px solid transparent;
+      margin-bottom: 2px;
+    }
+    .sidebar-nav .nav-item:hover {
+      background: var(--color-surface-hover);
+      color: #fff;
+    }
+    .sidebar-nav .nav-item.active {
+      background: var(--color-surface-hover);
+      border-left-color: var(--neon-purple);
+      color: #fff;
+    }
+    .sidebar-nav .nav-item i {
+      width: 1.2rem;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+    .sidebar-nav .nav-divider {
+      border-top: 1px solid var(--color-border);
+      margin: 0.6rem 0.5rem;
+      padding: 0.4rem 0 0.2rem;
+    }
+    .sidebar-nav .nav-divider span {
+      font-size: 0.55rem;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-weight: 700;
+      padding: 0 0.5rem;
+    }
+
+    /* CONTENIDO PRINCIPAL */
+    .main {
+      flex: 1;
+      padding: 1.2rem 1.5rem 2rem;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+
+    /* ========================================
+       BOTÓN HAMBURGUESA (móvil)
+       ======================================== */
+    .hamburger {
+      display: none;
+      position: fixed;
+      top: 0.8rem;
+      left: 0.8rem;
+      z-index: 200;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 0.5rem 0.7rem;
+      color: var(--color-text);
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .hamburger:hover {
+      background: var(--color-surface-hover);
+    }
+
+    /* ========================================
+       SECCIONES
+       ======================================== */
+    .section {
+      display: none;
+      animation: fadeSlide 0.3s ease;
+    }
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: -0.5px;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .section-title span {
+      color: var(--neon-purple);
+    }
+
+    /* Tarjetas glass */
+    .card {
+      background: rgba(20, 20, 30, 0.7);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      transition: border-color 0.2s;
+    }
+    .card:hover {
+      border-color: var(--neon-purple);
+    }
+
+    .card-header {
+      font-weight: 700;
+      color: var(--color-text-muted);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 0.6rem;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 0.3rem;
+    }
+
+    /* Tablas compactas */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      background: rgba(0,0,0,0.2);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+    }
+    thead {
+      background: rgba(30, 30, 47, 0.6);
+      border-bottom: 1px solid var(--color-border);
+    }
+    thead th {
+      padding: 0.5rem 0.6rem;
+      text-align: left;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-muted);
+      font-size: 0.6rem;
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid rgba(45, 45, 68, 0.3);
+      transition: background 0.15s;
+    }
+    tbody tr:hover {
+      background: var(--color-surface-hover);
+    }
+    tbody td {
+      padding: 0.45rem 0.6rem;
+      vertical-align: middle;
+    }
+
+    /* Badges de poder */
+    .power-badge {
+      display: inline-block;
+      font-size: 0.6rem;
+      font-weight: 900;
+      padding: 0.05rem 0.5rem;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+      margin-right: 0.2rem;
+    }
+    .power-badge.atk { color: var(--neon-cyan); background: rgba(34,211,238,0.12); border: 1px solid rgba(34,211,238,0.25); }
+    .power-badge.def { color: var(--neon-pink); background: rgba(236,72,153,0.12); border: 1px solid rgba(236,72,153,0.25); }
+    .power-badge.glb { color: var(--neon-yellow); background: rgba(250,204,21,0.12); border: 1px solid rgba(250,204,21,0.25); }
+
+    /* Estados en tabla */
+    .row-clasif { border-left: 4px solid var(--neon-green); }
+    .row-descenso { border-left: 4px solid var(--neon-red); }
+    .row-ascenso { border-left: 4px solid var(--neon-yellow); }
+
+    /* Jugadores en equipos */
+    .player-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem 0.8rem;
+      padding: 0.2rem 0;
+    }
+    .player-tag {
+      background: rgba(0,0,0,0.3);
+      border-radius: 20px;
+      padding: 0.1rem 0.6rem;
+      font-size: 0.7rem;
+      border: 1px solid var(--color-border);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      white-space: nowrap;
+    }
+    .player-tag.captain { border-color: var(--neon-yellow); color: var(--neon-yellow); }
+    .player-tag.titular { border-color: var(--neon-cyan); color: var(--neon-cyan); }
+    .player-tag.suplente { border-color: var(--neon-pink); color: var(--neon-pink); }
+    .player-tag.reserva { border-color: var(--color-border); color: var(--color-text-muted); }
+
+    /* Mercado filtros */
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 0.8rem;
+      align-items: center;
+    }
+    .filters select, .filters input {
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 0.3rem 0.6rem;
+      color: var(--color-text);
+      font-size: 0.7rem;
+      outline: none;
+    }
+    .filters select:focus, .filters input:focus {
+      border-color: var(--neon-purple);
+    }
+
+    /* Pódium */
+    .podium {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 1rem;
+      padding: 1rem 0;
+      min-height: 140px;
+    }
+    .podium-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--color-surface);
+      border-radius: var(--radius) var(--radius) 0 0;
+      padding: 0.3rem 0.6rem;
+      width: 80px;
+      border-top: 2px solid var(--color-border);
+      border-left: 1px solid var(--color-border);
+      border-right: 1px solid var(--color-border);
+    }
+    .podium-item.first { height: 100px; border-color: var(--neon-yellow); background: rgba(250,204,21,0.08); }
+    .podium-item.second { height: 80px; border-color: #94a3b8; background: rgba(148,163,184,0.06); }
+    .podium-item.third { height: 60px; border-color: #b45309; background: rgba(180,83,9,0.06); }
+    .podium-item .pos { font-weight: 900; font-size: 0.6rem; color: var(--color-text-muted); }
+    .podium-item .name { font-weight: 700; font-size: 0.65rem; text-align: center; margin-top: 0.1rem; color: #fff; }
+    .podium-item .value { font-weight: 900; font-size: 0.9rem; color: var(--neon-yellow); margin-top: auto; }
+
+    /* Escudos pequeños */
+    .shield-sm {
+      width: 1.6rem;
+      height: 1.6rem;
+      object-fit: contain;
+      background: #000;
+      border-radius: 50%;
+      border: 1px solid var(--color-border);
+      flex-shrink: 0;
+    }
+
+    /* ========================================
+       RESPONSIVE
+       ======================================== */
+    @media (max-width: 820px) {
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        transform: translateX(-100%);
+        width: 250px;
+        height: 100vh;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.6);
+        border-right: 1px solid var(--color-border);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .hamburger {
+        display: block;
+      }
+      .main {
+        padding: 0.8rem 0.8rem 2rem;
+        margin-top: 3.2rem;
+      }
+      .section-title {
+        font-size: 1.2rem;
+      }
+      table {
+        font-size: 0.65rem;
+      }
+      thead th, tbody td {
+        padding: 0.3rem 0.4rem;
+      }
+      .podium-item {
+        width: 60px;
+      }
+      .podium-item.first { height: 80px; }
+      .podium-item.second { height: 65px; }
+      .podium-item.third { height: 50px; }
+      .player-tag {
+        font-size: 0.6rem;
+        padding: 0.05rem 0.4rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main {
+        padding: 0.5rem 0.5rem 1.5rem;
+      }
+      .card {
+        padding: 0.6rem;
+      }
+      .filters select, .filters input {
+        font-size: 0.6rem;
+        padding: 0.2rem 0.4rem;
+      }
+    }
+
+    /* ========================================
+       UTILIDADES
+       ======================================== */
+    .text-muted { color: var(--color-text-muted); }
+    .text-neon-cyan { color: var(--neon-cyan); }
+    .text-neon-pink { color: var(--neon-pink); }
+    .text-neon-green { color: var(--neon-green); }
+    .text-neon-yellow { color: var(--neon-yellow); }
+    .text-neon-red { color: var(--neon-red); }
+    .text-neon-purple { color: var(--neon-purple); }
+    .bg-neon-green { background: var(--neon-green); }
+    .bg-neon-red { background: var(--neon-red); }
+    .bg-neon-yellow { background: var(--neon-yellow); }
+
+    .flex-center { display: flex; align-items: center; gap: 0.4rem; }
+    .gap-1 { gap: 0.3rem; }
+    .mt-1 { margin-top: 0.5rem; }
+    .mb-1 { margin-bottom: 0.5rem; }
+    .fw-700 { font-weight: 700; }
+
+    .empty-state {
+      padding: 2rem 1rem;
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: 0.85rem;
+    }
+    .empty-state i {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.5rem;
+      opacity: 0.5;
+    }
+
+    /* Scroll horizontal en tablas */
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* ========================================
+       ANIMACIONES EXTRA
+       ======================================== */
+    .hover-scale {
+      transition: transform 0.15s;
+    }
+    .hover-scale:hover {
+      transform: scale(1.02);
+    }
+  </style>
 </head>
 <body>
-  <div id="app">
-    <!-- Sidebar -->
-    <aside id="sidebar" class="sidebar">
-      <div class="sidebar-brand">
-        <h1>MAGIC <span>NEXUS</span></h1>
-        <p id="tournament-name">Visor de Torneo</p>
-      </div>
-      <nav id="sidebar-nav">
-        <ul>
-          <li><a href="#" data-view="tabla-general"><i class="fas fa-table"></i> Tabla general</a></li>
-          <li><a href="#" data-view="tabla-media"><i class="fas fa-chart-simple"></i> Tabla de Media</a></li>
-          <li><a href="#" data-view="jornadas"><i class="fas fa-calendar-day"></i> Jornadas</a></li>
-          <li><a href="#" data-view="playoffs"><i class="fas fa-sitemap"></i> PlayOffs</a></li>
-          <li><a href="#" data-view="stats"><i class="fas fa-chart-bar"></i> Stats</a></li>
-          <li><a href="#" data-view="balon-oro"><i class="fas fa-trophy"></i> Balón de Oro</a></li>
-          <li><a href="#" data-view="equipos"><i class="fas fa-users"></i> Equipos</a></li>
-          <li><a href="#" data-view="mercado"><i class="fas fa-store"></i> Mercado</a></li>
-          <li><a href="#" data-view="economia"><i class="fas fa-coins"></i> Movimientos Económicos</a></li>
-          <li><a href="#" data-view="sanciones"><i class="fas fa-gavel"></i> Sanciones</a></li>
-          <li><a href="#" data-view="seleccion"><i class="fas fa-flag"></i> Selección Nacional</a></li>
-        </ul>
-      </nav>
-      <div class="sidebar-footer">
-        <span>KERNEL X v3.6</span>
-      </div>
-    </aside>
 
-    <!-- Botón hamburguesa (móvil) -->
-    <button id="menu-toggle" class="menu-toggle" aria-label="Abrir menú">
-      <i class="fas fa-bars"></i>
-    </button>
+<div class="app">
 
-    <!-- Contenido principal -->
-    <main id="main-content">
-      <header id="main-header">
-        <h2 id="view-title">Tabla general</h2>
-      </header>
-      <div id="view-container">
-        <!-- El contenido se renderiza aquí dinámicamente -->
-        <div class="loading-container">
-          <div class="loader"></div>
-          <p>Cargando datos del torneo...</p>
-        </div>
-      </div>
-    </main>
-  </div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <h1>MTM <span>NEXUS</span></h1>
+      <small>Visualizador de Torneo</small>
+    </div>
+    <nav class="sidebar-nav" id="mainNav">
+      <!-- Los ítems se generan con JS -->
+    </nav>
+  </aside>
 
-  <script>
-    // ============================================
-    // CARGA DE DATOS DESDE JSON (OPCIÓN 2)
-    // ============================================
-    
-    // Variable global que contendrá los datos del torneo
-    let torneoData = null;
-    
-    // Función principal que se ejecuta cuando los datos están cargados
-    function iniciarVisor() {
-      // Verificar que los datos se cargaron correctamente
-      if (!torneoData || !torneoData.teams) {
-        console.warn('No se encontraron datos válidos. Usando datos de ejemplo mínimos.');
-        torneoData = {
-          name: 'Torneo de Ejemplo',
-          teams: [],
-          rounds: [],
-          playoffs: null,
-          tableConfig: { liguilla: 8, descenso: 2, ascenso: 2 },
-          economyLogs: [],
-          sanctionsLog: [],
-          nationalTeams: []
-        };
-      }
-      
-      // Actualizar nombre del torneo en el sidebar
-      const nameEl = document.getElementById('tournament-name');
-      if (nameEl && torneoData.name) {
-        nameEl.textContent = torneoData.name;
-      }
-      
-      // Inicializar la aplicación con los datos cargados
-      inicializarApp(torneoData);
-    }
+  <!-- BOTÓN HAMBURGUESA -->
+  <button class="hamburger" id="hamburgerBtn" aria-label="Menú">
+    <i class="fas fa-bars"></i>
+  </button>
 
-    // ============================================
-    // CARGA DEL ARCHIVO JSON
-    // ============================================
-    function cargarDatos() {
-      const container = document.getElementById('view-container');
-      
-      fetch('datos.json')
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`Error HTTP: ${response.status} - ${response.statusText}`);
-          }
-          return response.json();
-        })
-        .then(data => {
-          console.log('✅ Datos cargados correctamente desde datos.json');
-          torneoData = data;
-          iniciarVisor();
-        })
-        .catch(err => {
-          console.error('❌ Error cargando datos.json:', err);
-          container.innerHTML = `
-            <div class="error-container">
-              <i class="fas fa-exclamation-triangle" style="font-size:2rem;color:var(--neon-red);"></i>
-              <h3 style="color:var(--neon-red);">Error al cargar los datos</h3>
-              <p>No se pudo cargar el archivo <strong>datos.json</strong>.</p>
-              <p style="font-size:0.85rem;color:var(--color-text-muted);">
-                Asegúrate de que el archivo <strong>datos.json</strong> esté en la misma carpeta que este HTML.<br>
-                Si estás usando un servidor local, verifica que el archivo sea accesible.
-              </p>
-              <details style="margin-top:1rem;text-align:left;font-size:0.8rem;color:var(--color-text-muted);">
-                <summary>Ver detalles del error</summary>
-                <pre style="background:rgba(0,0,0,0.5);padding:0.5rem;border-radius:6px;margin-top:0.5rem;overflow-x:auto;">${err.message}</pre>
-              </details>
-              <button onclick="cargarDatos()" class="btn-reintentar" style="margin-top:1rem;padding:0.5rem 1.5rem;border-radius:8px;background:var(--neon-cyan);color:#000;border:none;font-weight:700;cursor:pointer;">
-                <i class="fas fa-sync-alt"></i> Reintentar
-              </button>
-              <button onclick="cargarDatosEjemplo()" class="btn-ejemplo" style="margin-top:0.5rem;padding:0.5rem 1.5rem;border-radius:8px;background:var(--color-surface);color:#fff;border:1px solid var(--color-border);font-weight:700;cursor:pointer;">
-                <i class="fas fa-file-alt"></i> Cargar datos de ejemplo
-              </button>
-            </div>
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="main" id="mainContent">
+    <!-- Cada sección se genera dinámicamente con JS -->
+    <div id="sectionsContainer"></div>
+  </main>
+
+</div>
+
+<script>
+  // ==========================================
+  // CONFIGURACIÓN DE MENÚS
+  // ==========================================
+  const MENU_ITEMS = [
+    { id: 'tabla', label: 'Tabla General', icon: 'fa-table' },
+    { id: 'media', label: 'Tabla de Media', icon: 'fa-chart-simple' },
+    { id: 'jornadas', label: 'Jornadas', icon: 'fa-calendar-day' },
+    { id: 'playoffs', label: 'PlayOffs', icon: 'fa-sitemap' },
+    { id: 'stats', label: 'Stats', icon: 'fa-chart-bar' },
+    { id: 'balon', label: 'Balón de Oro', icon: 'fa-trophy' },
+    { id: 'equipos', label: 'Equipos', icon: 'fa-users' },
+    { id: 'mercado', label: 'Mercado', icon: 'fa-store' },
+    { id: 'economia', label: 'Mov. Económicos', icon: 'fa-coins' },
+    { id: 'sanciones', label: 'Sanciones', icon: 'fa-gavel' },
+    { id: 'seleccion', label: 'Selección Nacional', icon: 'fa-flag' }
+  ];
+
+  // ==========================================
+  // ESTADO
+  // ==========================================
+  let data = null;          // Torneo completo
+  let currentSection = 'tabla';
+
+  // ==========================================
+  // DOM REFS
+  // ==========================================
+  const sidebar = document.getElementById('sidebar');
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const mainNav = document.getElementById('mainNav');
+  const sectionsContainer = document.getElementById('sectionsContainer');
+
+  // ==========================================
+  // UTILIDADES
+  // ==========================================
+  function formatCurrency(amount) {
+    if (amount >= 1e6) return '$' + (amount / 1e6).toFixed(1) + 'M';
+    if (amount >= 1e3) return '$' + (amount / 1e3).toFixed(0) + 'K';
+    return '$' + amount.toFixed(0);
+  }
+
+  function getRankColor(rank) {
+    const colors = {
+      'Bronce': '#cd7f32', 'Plata': '#c0c0c0', 'Oro': '#ffd700',
+      'Platino': '#e5e4e2', 'Diamante': '#b9f2ff', 'Campeón': '#ff6b6b',
+      'Gran Campeón': '#ff4757', 'SSL': '#ff4757'
+    };
+    return colors[rank] || '#fff';
+  }
+
+  function getTeamById(teams, id) {
+    return teams.find(t => t.id === id);
+  }
+
+  function getPlayerName(team, playerId) {
+    if (!team) return '?';
+    const p = team.players.find(x => x.id === playerId);
+    return p ? p.name : '?';
+  }
+
+  // ==========================================
+  // RENDERIZADO DE SECCIONES
+  // ==========================================
+
+  // ---------- TABLA GENERAL ----------
+  function renderTabla(torneo) {
+    if (!torneo.teams || torneo.teams.length === 0) return '<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i>No hay equipos.</div>';
+    const teams = [...torneo.teams];
+    // Ordenar por pts, DG, GF
+    teams.sort((a,b) => b.pts - a.pts || (b.gf - b.gc) - (a.gf - a.gc) || b.gf - a.gf);
+
+    const lig = torneo.tableConfig?.liguilla ?? 8;
+    const des = torneo.tableConfig?.descenso ?? 2;
+    const asc = torneo.tableConfig?.ascenso ?? 2;
+
+    let html = `
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Equipo</th><th>Pts</th><th>PJ</th><th>PG</th><th>PE</th><th>PP</th><th>GF</th><th>GC</th><th>DG</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+    teams.forEach((tm, i) => {
+      let rowClass = '';
+      if (i < asc && torneo.linkedTournamentId) rowClass = 'row-ascenso';
+      else if (i < lig) rowClass = 'row-clasif';
+      else if (i >= teams.length - des && des > 0) rowClass = 'row-descenso';
+
+      const dg = (tm.gf || 0) - (tm.gc || 0);
+      html += `
+        <tr class="${rowClass}">
+          <td>${i+1}</td>
+          <td class="flex-center"><img src="${tm.shield || ''}" class="shield-sm" alt=""> ${tm.name}</td>
+          <td><strong>${tm.pts || 0}</strong></td>
+          <td>${tm.pj || 0}</td>
+          <td>${tm.pg || 0}</td>
+          <td>${tm.pe || 0}</td>
+          <td>${tm.pp || 0}</td>
+          <td>${tm.gf || 0}</td>
+          <td>${tm.gc || 0}</td>
+          <td>${dg}</td>
+        </tr>
+      `;
+    });
+    html += '</tbody></table></div>';
+
+    // Leyenda
+    let legend = '<div class="flex-center gap-1" style="font-size:0.65rem; margin-top:0.5rem;">';
+    if (lig > 0) legend += `<span class="flex-center"><span style="display:inline-block;width:10px;height:10px;background:var(--neon-green);border-radius:2px;"></span> Clasificación</span>`;
+    if (asc > 0 && torneo.linkedTournamentId) legend += `<span class="flex-center"><span style="display:inline-block;width:10px;height:10px;background:var(--neon-yellow);border-radius:2px;"></span> Ascenso</span>`;
+    if (des > 0) legend += `<span class="flex-center"><span style="display:inline-block;width:10px;height:10px;background:var(--neon-red);border-radius:2px;"></span> Descenso</span>`;
+    legend += '</div>';
+    return html + legend;
+  }
+
+  // ---------- TABLA DE MEDIA ----------
+  function renderMedia(torneo) {
+    if (!torneo.teams || torneo.teams.length === 0) return '<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i>No hay equipos.</div>';
+    const sorted = [...torneo.teams].sort((a,b) => (b.glb || 0) - (a.glb || 0));
+    let html = `
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Equipo</th><th>ATK</th><th>DEF</th><th>GLB</th></tr></thead>
+          <tbody>
+    `;
+    sorted.forEach((tm, i) => {
+      html += `
+        <tr>
+          <td>${i+1}</td>
+          <td class="flex-center"><img src="${tm.shield || ''}" class="shield-sm"> ${tm.name}</td>
+          <td><span class="power-badge atk">${tm.atk || 0}</span></td>
+          <td><span class="power-badge def">${tm.def || 0}</span></td>
+          <td><span class="power-badge glb">${tm.glb || 0}</span></td>
+        </tr>
+      `;
+    });
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+  // ---------- JORNADAS ----------
+  function renderJornadas(torneo) {
+    if (!torneo.rounds || torneo.rounds.length === 0) return '<div class="empty-state"><i class="fa-solid fa-calendar-xmark"></i>No hay jornadas generadas.</div>';
+    let html = '';
+    const total = torneo.rounds.length;
+    // Mostrar todas las jornadas o solo la actual? Mostrar todas con un acordeón simple.
+    // Para no sobrecargar, mostrar todas en orden.
+    torneo.rounds.forEach((round, idx) => {
+      html += `<div class="card"><div class="card-header">Jornada ${idx+1}</div>`;
+      if (round.length === 0) {
+        html += '<div class="text-muted" style="font-size:0.7rem;">Sin partidos</div>';
+      } else {
+        html += `<div class="table-wrap"><table><thead><tr><th>Local</th><th>Resultado</th><th>Visitante</th></tr></thead><tbody>`;
+        round.forEach(m => {
+          const h = getTeamById(torneo.teams, m.h);
+          const a = getTeamById(torneo.teams, m.a);
+          const hName = h ? h.name : '???';
+          const aName = a ? a.name : '???';
+          const hShield = h ? h.shield : '';
+          const aShield = a ? a.shield : '';
+          const played = m.played || false;
+          const score = played ? `${m.sH} - ${m.sA}` : 'vs';
+          html += `
+            <tr>
+              <td class="flex-center"><img src="${hShield}" class="shield-sm"> ${hName}</td>
+              <td style="font-weight:700;text-align:center;">${score}</td>
+              <td class="flex-center" style="justify-content:flex-end;">${aName} <img src="${aShield}" class="shield-sm"></td>
+            </tr>
           `;
         });
+        html += '</tbody></table></div>';
+      }
+      html += '</div>';
+    });
+    return html;
+  }
+
+  // ---------- PLAYOFFS ----------
+  function renderPlayoffs(torneo) {
+    if (!torneo.playoffs || !torneo.playoffs.rounds || torneo.playoffs.rounds.length === 0) {
+      return '<div class="empty-state"><i class="fa-solid fa-clock"></i>Próximamente</div>';
     }
-
-    // ============================================
-    // DATOS DE EJEMPLO (FALLBACK)
-    // ============================================
-    function cargarDatosEjemplo() {
-      console.log('📂 Cargando datos de ejemplo...');
-      torneoData = {
-        name: 'Torneo de Ejemplo (Sin datos reales)',
-        teams: [
-          {
-            id: 'eq1',
-            name: 'Equipo A',
-            shield: '',
-            players: [
-              { id: 'p1', name: 'Jugador 1', role: 'Titular 🌟', rocketRank: 'Platino', division: 2, seasonStats: { goals: 5, assists: 3, saves: 2, pig: 15.5 }, marketValue: 25000, isCaptain: true },
-              { id: 'p2', name: 'Jugador 2', role: 'Suplente 🔄', rocketRank: 'Oro', division: 2, seasonStats: { goals: 2, assists: 1, saves: 0, pig: 5.5 }, marketValue: 10000 }
-            ],
-            budget: 100000,
-            totalValue: 35000,
-            glb: 120,
-            pts: 6,
-            pj: 3,
-            pg: 2,
-            pe: 0,
-            pp: 1,
-            gf: 8,
-            gc: 4
-          },
-          {
-            id: 'eq2',
-            name: 'Equipo B',
-            shield: '',
-            players: [
-              { id: 'p3', name: 'Jugador 3', role: 'Titular 🌟', rocketRank: 'Diamante', division: 1, seasonStats: { goals: 8, assists: 4, saves: 3, pig: 24.5 }, marketValue: 45000, isCaptain: true }
-            ],
-            budget: 75000,
-            totalValue: 45000,
-            glb: 150,
-            pts: 9,
-            pj: 3,
-            pg: 3,
-            pe: 0,
-            pp: 0,
-            gf: 12,
-            gc: 2
-          }
-        ],
-        rounds: [],
-        playoffs: null,
-        tableConfig: { liguilla: 8, descenso: 2, ascenso: 2 },
-        economyLogs: [],
-        sanctionsLog: [],
-        nationalTeams: []
-      };
-      iniciarVisor();
-    }
-
-    // ============================================
-    // APLICACIÓN PRINCIPAL
-    // ============================================
-    function inicializarApp(data) {
-      // -------- UTILIDADES --------
-      const $ = (sel, ctx=document) => ctx.querySelector(sel);
-      const $$ = (sel, ctx=document) => [...ctx.querySelectorAll(sel)];
-
-      // Formatear moneda
-      function formatCurrency(amount) {
-        if (amount >= 1e6) return '$' + (amount/1e6).toFixed(1) + 'M';
-        if (amount >= 1e3) return '$' + (amount/1e3).toFixed(0) + 'K';
-        return '$' + Math.round(amount);
-      }
-
-      // Obtener color del rango
-      function rankColor(rank) {
-        const colors = {
-          'Bronce': '#cd7f32',
-          'Plata': '#c0c0c0',
-          'Oro': '#ffd700',
-          'Platino': '#e5e4e2',
-          'Diamante': '#b9f2ff',
-          'Campeón': '#ff6b6b',
-          'Gran Campeón': '#ff4757',
-          'SSL': '#ff4757'
-        };
-        return colors[rank] || '#fff';
-      }
-
-      // Estrellas GLB
-      function glbStars(glb) {
-        if (glb >= 450) return '★★★★★';
-        if (glb >= 350) return '★★★★☆';
-        if (glb >= 250) return '★★★☆☆';
-        if (glb >= 150) return '★★☆☆☆';
-        if (glb >= 70) return '★☆☆☆☆';
-        return '☆☆☆☆☆';
-      }
-
-      // -------- DATOS --------
-      const teams = data.teams || [];
-      const rounds = data.rounds || [];
-      const playoffs = data.playoffs || null;
-      const tableConfig = data.tableConfig || { liguilla: 8, descenso: 2, ascenso: 2 };
-      const economyLogs = data.economyLogs || [];
-      const sanctionsLog = data.sanctionsLog || [];
-      const nationalTeams = data.nationalTeams || [];
-
-      // -------- RENDERIZADORES --------
-      const views = {};
-
-      // 1. Tabla general
-      views['tabla-general'] = function() {
-        if (!teams.length) return '<p class="empty">No hay equipos.</p>';
-        const sorted = [...teams].sort((a,b) => 
-          (b.pts||0) - (a.pts||0) || 
-          ((b.gf||0)-(b.gc||0)) - ((a.gf||0)-(a.gc||0)) || 
-          (b.gf||0) - (a.gf||0)
-        );
-        const lig = tableConfig.liguilla || 8;
-        const des = tableConfig.descenso || 2;
-        const asc = tableConfig.ascenso || 2;
-        const showAsc = data.linkedTournamentId && data.divisionLevel > 1;
-
-        let html = `<div class="table-responsive"><table class="table-clasificacion">
-          <thead>
-            <tr><th>Pos</th><th>Club</th><th>Pts</th><th>PJ</th><th>PG</th><th>PE</th><th>PP</th><th>DG</th></tr>
-          </thead>
-          <tbody>`;
-        sorted.forEach((tm, i) => {
-          let cls = '';
-          if (i < asc && showAsc) cls = 'row-ascenso';
-          else if (i < lig) cls = 'row-clasif';
-          else if (i >= sorted.length - des && des > 0) cls = 'row-descenso';
-          const dg = (tm.gf||0) - (tm.gc||0);
-          html += `<tr class="${cls}">
-            <td>${i+1}</td>
-            <td><img src="${tm.shield||''}" class="team-shield-mini" alt=""/> ${tm.name}</td>
-            <td><strong>${tm.pts||0}</strong></td>
-            <td>${tm.pj||0}</td>
-            <td>${tm.pg||0}</td>
-            <td>${tm.pe||0}</td>
-            <td>${tm.pp||0}</td>
-            <td>${dg}</td>
-          </tr>`;
-        });
-        html += `</tbody></table></div>`;
-        html += `<div class="legends">
-          <span><span class="legend-color" style="background:var(--neon-green)"></span> Clasificación</span>
-          ${showAsc ? `<span><span class="legend-color" style="background:var(--neon-yellow)"></span> Ascenso</span>` : ''}
-          ${des > 0 ? `<span><span class="legend-color" style="background:var(--neon-red)"></span> Descenso</span>` : ''}
-        </div>`;
-        return html;
-      };
-
-      // 2. Tabla de Media
-      views['tabla-media'] = function() {
-        if (!teams.length) return '<p class="empty">No hay equipos.</p>';
-        const sorted = [...teams].sort((a,b) => (b.glb||0) - (a.glb||0));
-        let html = `<div class="table-responsive"><table class="table-media">
-          <thead>
-            <tr><th>Pos</th><th>Club</th><th>ATK</th><th>DEF</th><th>GLB</th><th>Estrellas</th></tr>
-          </thead>
-          <tbody>`;
-        sorted.forEach((tm, i) => {
-          html += `<tr>
-            <td>${i+1}</td>
-            <td><img src="${tm.shield||''}" class="team-shield-mini" alt=""/> ${tm.name}</td>
-            <td>${tm.atk||50}</td>
-            <td>${tm.def||50}</td>
-            <td><strong>${tm.glb||50}</strong></td>
-            <td>${glbStars(tm.glb||50)}</td>
-          </tr>`;
-        });
-        html += `</tbody></table></div>`;
-        return html;
-      };
-
-      // 3. Jornadas
-      views['jornadas'] = function() {
-        if (!rounds.length) return '<p class="empty">No hay jornadas generadas.</p>';
-        let html = '';
-        rounds.forEach((round, idx) => {
-          html += `<div class="jornada-card">
-            <h4>Jornada ${idx+1}</h4>
-            <div class="partidos">`;
-          round.forEach(m => {
-            const home = teams.find(t => t.id === m.h) || { name: '???', shield: '' };
-            const away = teams.find(t => t.id === m.a) || { name: '???', shield: '' };
-            const resultado = m.played ? `${m.sH} - ${m.sA}` : 'vs';
-            const statsHtml = (m.played && m.stats && m.stats.length) ? 
-              `<button class="btn-ver-stats" onclick="this.nextElementSibling.classList.toggle('hidden')">Ver stats</button>
-              <div class="stats-detalle hidden">
-                ${m.stats.map(s => {
-                  const p = teams.flatMap(t=>t.players).find(p=>p.id===s.pId);
-                  return `<span>${p?p.name:'Jugador'}: ${s.g}G ${s.a}A ${s.s}S</span>`;
-                }).join(', ')}
-              </div>` : '';
-            html += `<div class="partido">
-              <div class="equipo"><img src="${home.shield||''}" class="team-shield-mini"/> ${home.name}</div>
-              <div class="resultado">${resultado}</div>
-              <div class="equipo"><img src="${away.shield||''}" class="team-shield-mini"/> ${away.name}</div>
-              ${statsHtml}
-            </div>`;
-          });
-          html += `</div></div>`;
-        });
-        return html;
-      };
-
-      // 3.5 PlayOffs
-      views['playoffs'] = function() {
-        if (!playoffs || !playoffs.rounds || !playoffs.rounds.length) {
-          return '<p class="empty">Próximamente</p>';
-        }
-        let html = `<div class="playoffs-bracket">`;
-        playoffs.rounds.forEach((round, ri) => {
-          html += `<div class="playoff-ronda"><h4>Ronda ${ri+1}</h4>`;
-          round.forEach(m => {
-            const home = teams.find(t => t.id === m.h) || { name: 'TBD', shield: '' };
-            const away = teams.find(t => t.id === m.a) || { name: 'TBD', shield: '' };
-            const res = m.played ? `${m.sH} - ${m.sA}` : 'vs';
-            html += `<div class="playoff-partido">
-              <span>${home.name}</span> <strong>${res}</strong> <span>${away.name}</span>
-            </div>`;
-          });
-          html += `</div>`;
-        });
-        html += `</div>`;
-        return html;
-      };
-
-      // 4. Stats
-      views['stats'] = function() {
-        const playerStats = {};
-        rounds.forEach(round => {
-          round.forEach(m => {
-            if (m.played && m.stats) {
-              m.stats.forEach(s => {
-                if (!playerStats[s.pId]) {
-                  const p = teams.flatMap(t=>t.players).find(p=>p.id===s.pId);
-                  playerStats[s.pId] = { 
-                    name: p ? p.name : 'Jugador',
-                    teamId: s.tId,
-                    teamName: teams.find(t=>t.id===s.tId)?.name || '',
-                    shield: teams.find(t=>t.id===s.tId)?.shield || '',
-                    g: 0, a: 0, sv: 0, t: 0, pig: 0
-                  };
-                }
-                playerStats[s.pId].g += s.g || 0;
-                playerStats[s.pId].a += s.a || 0;
-                playerStats[s.pId].sv += s.s || 0;
-                playerStats[s.pId].t += s.t || 0;
-                playerStats[s.pId].pig += (s.g||0)*2 + (s.a||0)*1.5 + (s.s||0)*1 + (s.t||0)*0.2;
-              });
-            }
-          });
-        });
-        const players = Object.values(playerStats);
-        const topG = [...players].sort((a,b)=>b.g-a.g).slice(0,10);
-        const topA = [...players].sort((a,b)=>b.a-a.a).slice(0,10);
-        const topSv = [...players].sort((a,b)=>b.sv-a.sv).slice(0,10);
-        const topT = [...players].sort((a,b)=>b.t-a.t).slice(0,10);
-
-        const mvpPorJornada = [];
-        rounds.forEach((round, idx) => {
-          const statsJ = {};
-          round.forEach(m => {
-            if (m.played && m.stats) {
-              m.stats.forEach(s => {
-                if (!statsJ[s.pId]) statsJ[s.pId] = { pig: 0 };
-                statsJ[s.pId].pig += (s.g||0)*2 + (s.a||0)*1.5 + (s.s||0)*1 + (s.t||0)*0.2;
-              });
-            }
-          });
-          const entries = Object.entries(statsJ);
-          if (entries.length) {
-            const best = entries.reduce((a,b) => a[1].pig > b[1].pig ? a : b);
-            const player = players.find(p => p.id === best[0]);
-            if (player) {
-              mvpPorJornada.push({ jornada: idx+1, name: player.name, pig: best[1].pig });
-            }
-          }
-        });
-
-        const renderTabla = (titulo, items, key, label) => {
-          if (!items.length) return `<p>Sin datos</p>`;
-          return `<table class="table-stats"><thead><tr><th>#</th><th>Jugador</th><th>${label}</th></tr></thead><tbody>
-            ${items.map((p,i) => `<tr><td>${i+1}</td><td><img src="${p.shield||''}" class="team-shield-mini"/> ${p.name}</td><td>${p[key]}</td></tr>`).join('')}
-          </tbody></table>`;
-        };
-
-        const renderMvp = () => {
-          if (!mvpPorJornada.length) return '<p>Sin MVPs registrados.</p>';
-          return `<table class="table-stats"><thead><tr><th>Jornada</th><th>Jugador</th><th>PIG</th></tr></thead><tbody>
-            ${mvpPorJornada.map(m => `<tr><td>${m.jornada}</td><td>${m.name}</td><td>${m.pig.toFixed(1)}</td></tr>`).join('')}
-          </tbody></table>`;
-        };
-
-        return `
-          <div class="stats-tabs">
-            <button class="stats-tab active" data-tab="goles">Goleadores</button>
-            <button class="stats-tab" data-tab="asistencias">Asistencias</button>
-            <button class="stats-tab" data-tab="salvadas">Salvadas</button>
-            <button class="stats-tab" data-tab="tiros">Tiros</button>
-            <button class="stats-tab" data-tab="mvp">MVP Jornada</button>
-          </div>
-          <div class="stats-content">
-            <div id="stats-goles" class="stats-panel active">${renderTabla('Goleadores', topG, 'g', 'Goles')}</div>
-            <div id="stats-asistencias" class="stats-panel hidden">${renderTabla('Asistencias', topA, 'a', 'Asistencias')}</div>
-            <div id="stats-salvadas" class="stats-panel hidden">${renderTabla('Salvadas', topSv, 'sv', 'Salvadas')}</div>
-            <div id="stats-tiros" class="stats-panel hidden">${renderTabla('Tiros', topT, 't', 'Tiros')}</div>
-            <div id="stats-mvp" class="stats-panel hidden">${renderMvp()}</div>
+    const rounds = torneo.playoffs.rounds;
+    let html = '<div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;">';
+    rounds.forEach((r, ri) => {
+      html += `<div style="display:flex;flex-direction:column;gap:0.5rem;min-width:140px;">`;
+      html += `<div class="card-header" style="text-align:center;">${ri === 0 ? 'Cuartos' : ri === 1 ? 'Semis' : ri === 2 ? 'Final' : `Ronda ${ri+1}`}</div>`;
+      r.forEach(m => {
+        const h = getTeamById(torneo.teams, m.h);
+        const a = getTeamById(torneo.teams, m.a);
+        const hName = h ? h.name : 'TBD';
+        const aName = a ? a.name : 'TBD';
+        const hShield = h ? h.shield : '';
+        const aShield = a ? a.shield : '';
+        const played = m.played || false;
+        const score = played ? `${m.sH} - ${m.sA}` : 'vs';
+        html += `
+          <div class="card" style="padding:0.4rem 0.6rem;margin:0;min-width:120px;">
+            <div class="flex-center" style="justify-content:space-between;font-size:0.7rem;">
+              <span class="flex-center"><img src="${hShield}" class="shield-sm" style="width:1.2rem;height:1.2rem;"> ${hName}</span>
+              <span style="font-weight:700;">${score}</span>
+              <span class="flex-center">${aName} <img src="${aShield}" class="shield-sm" style="width:1.2rem;height:1.2rem;"></span>
+            </div>
           </div>
         `;
-      };
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+    return html;
+  }
 
-      // 5. Balón de Oro
-      views['balon-oro'] = function() {
-        const allPlayers = teams.flatMap(t => t.players.map(p => ({
-          ...p,
-          teamName: t.name,
-          shield: t.shield,
-          pig: p.seasonStats?.pig || 0,
-          goals: p.seasonStats?.goals || 0,
-          assists: p.seasonStats?.assists || 0,
-          saves: p.seasonStats?.saves || 0,
-          shots: p.seasonStats?.shots || 0
-        })));
-        const sorted = allPlayers.filter(p => p.name && p.name.trim()).sort((a,b) => (b.pig||0) - (a.pig||0));
-        if (!sorted.length) return '<p class="empty">No hay jugadores.</p>';
-        const top3 = sorted.slice(0,3);
-        const rest = sorted.slice(3);
-
-        let html = `<div class="podium">
-          ${top3.map((p,i) => {
-            const pos = i+1;
-            const cls = pos === 1 ? 'first' : (pos === 2 ? 'second' : 'third');
-            return `<div class="podium-item ${cls}">
-              <div class="pos">#${pos}</div>
-              <img src="${p.shield||''}" alt=""/>
-              <div class="name">${p.name}</div>
-              <div class="value">${p.pig.toFixed(1)} <small>PIG</small></div>
-            </div>`;
-          }).join('')}
-        </div>`;
-
-        html += `<div class="table-responsive"><table class="table-balon">
-          <thead><tr><th>#</th><th>Jugador</th><th>Equipo</th><th>PIG</th><th>G</th><th>A</th><th>S</th><th>T</th></tr></thead>
-          <tbody>`;
-        rest.forEach((p,i) => {
-          html += `<tr>
-            <td>${i+4}</td>
-            <td><img src="${p.shield||''}" class="team-shield-mini"/> ${p.name}</td>
-            <td>${p.teamName}</td>
-            <td>${p.pig.toFixed(1)}</td>
-            <td>${p.goals}</td>
-            <td>${p.assists}</td>
-            <td>${p.saves}</td>
-            <td>${p.shots}</td>
-          </tr>`;
-        });
-        html += `</tbody></table></div>`;
-        return html;
-      };
-
-      // 6. Equipos
-      views['equipos'] = function() {
-        if (!teams.length) return '<p class="empty">No hay equipos.</p>';
-        let html = '';
-        teams.forEach(team => {
-          const titulares = team.players.filter(p => p.role === 'Titular 🌟' || p.isCaptain);
-          const suplentes = team.players.filter(p => p.role === 'Suplente 🔄');
-          const reservas = team.players.filter(p => p.role === 'Reserva 💤' || (!p.role && !titulares.includes(p) && !suplentes.includes(p)));
-          html += `<div class="team-card-full">
-            <div class="team-header">
-              <img src="${team.shield||''}" class="team-shield-big" alt=""/>
-              <div>
-                <h3>${team.name}</h3>
-                <div class="team-meta">
-                  <span>💰 ${formatCurrency(team.budget||0)}</span>
-                  <span>📊 Valor: ${formatCurrency(team.totalValue||0)}</span>
-                  <span>⚡ GLB ${team.glb||50}</span>
-                  <span>📦 ${team.players.length}/12</span>
-                  <span>👤 DT: ${team.dt||'Sin DT'}</span>
-                </div>
-                <div class="stars">${glbStars(team.glb||50)}</div>
-              </div>
-            </div>
-            <div class="team-squad">
-              ${renderSquad('Titulares', titulares)}
-              ${renderSquad('Suplentes', suplentes)}
-              ${renderSquad('Reservas (F.B)', reservas)}
-            </div>
-          </div>`;
-        });
-        return html;
-      };
-
-      function renderSquad(label, players) {
-        if (!players.length) return `<div class="squad-group"><h5>${label}</h5><p class="empty-squad">Vacío</p></div>`;
-        return `<div class="squad-group"><h5>${label}</h5>
-          ${players.map(p => `
-            <div class="player-mini">
-              <span>${p.isCaptain ? '👑 ' : ''}${p.name}</span>
-              <span class="rank" style="color:${rankColor(p.rocketRank)}">${p.rocketRank||'Platino'}</span>
-              <span class="stats">⚽${p.seasonStats?.goals||0} 🎯${p.seasonStats?.assists||0} 🧤${p.seasonStats?.saves||0}</span>
-            </div>
-          `).join('')}
-        </div>`;
-      }
-
-      // 7. Mercado
-      views['mercado'] = function() {
-        const allPlayers = teams.flatMap(t => t.players.map(p => ({
-          ...p,
-          teamName: t.name,
-          teamId: t.id,
-          shield: t.shield,
-          pig: p.seasonStats?.pig || 0
-        }))).filter(p => p.name && p.name.trim());
-
-        if (!allPlayers.length) return '<p class="empty">No hay jugadores.</p>';
-
-        const teamOpts = [...new Set(allPlayers.map(p => p.teamId))].map(id => {
-          const t = teams.find(tm => tm.id === id);
-          return `<option value="${id}">${t?t.name:'Desconocido'}</option>`;
-        }).join('');
-
-        let html = `
-          <div class="filtros-mercado">
-            <div>
-              <label>Equipo</label>
-              <select id="filtro-equipo">
-                <option value="all">Todos</option>
-                ${teamOpts}
-              </select>
-            </div>
-            <div>
-              <label>Ordenar</label>
-              <select id="filtro-orden">
-                <option value="price-desc">Precio (mayor a menor)</option>
-                <option value="price-asc">Precio (menor a mayor)</option>
-                <option value="pig-desc">PIG (mayor a menor)</option>
-                <option value="pig-asc">PIG (menor a mayor)</option>
-                <option value="name-asc">Nombre (A-Z)</option>
-                <option value="name-desc">Nombre (Z-A)</option>
-              </select>
-            </div>
-            <div>
-              <label>Buscar</label>
-              <input type="text" id="filtro-buscar" placeholder="Jugador..."/>
-            </div>
-          </div>
-          <div class="table-responsive" id="mercado-tabla-container">
-            ${renderMercadoTabla(allPlayers)}
-          </div>
-        `;
-        return html;
-      };
-
-      function renderMercadoTabla(players, filtros={}) {
-        let filtered = [...players];
-        if (filtros.equipo && filtros.equipo !== 'all') {
-          filtered = filtered.filter(p => p.teamId === filtros.equipo);
+  // ---------- STATS ----------
+  function renderStats(torneo) {
+    // Recolectar stats de todos los jugadores de todos los equipos
+    const allPlayers = [];
+    torneo.teams.forEach(team => {
+      team.players.forEach(p => {
+        if (p.name && p.name.trim() !== '') {
+          const s = p.seasonStats || { goals:0, assists:0, saves:0, shots:0, pig:0 };
+          allPlayers.push({
+            ...p,
+            teamName: team.name,
+            teamShield: team.shield,
+            goals: s.goals || 0,
+            assists: s.assists || 0,
+            saves: s.saves || 0,
+            shots: s.shots || 0,
+            pig: s.pig || 0,
+            matchesPlayed: s.matchesPlayed || 0
+          });
         }
-        if (filtros.buscar) {
-          const q = filtros.buscar.toLowerCase();
-          filtered = filtered.filter(p => p.name.toLowerCase().includes(q));
-        }
-        const sort = filtros.orden || 'price-desc';
-        switch(sort) {
-          case 'price-desc': filtered.sort((a,b) => (b.marketValue||0) - (a.marketValue||0)); break;
-          case 'price-asc': filtered.sort((a,b) => (a.marketValue||0) - (b.marketValue||0)); break;
-          case 'pig-desc': filtered.sort((a,b) => (b.pig||0) - (a.pig||0)); break;
-          case 'pig-asc': filtered.sort((a,b) => (a.pig||0) - (b.pig||0)); break;
-          case 'name-asc': filtered.sort((a,b) => a.name.localeCompare(b.name)); break;
-          case 'name-desc': filtered.sort((a,b) => b.name.localeCompare(a.name)); break;
-        }
-        if (!filtered.length) return '<p class="empty">No hay jugadores con esos filtros.</p>';
-        return `<table class="table-mercado">
-          <thead><tr><th>Jugador</th><th>Equipo</th><th>PIG</th><th>Precio</th><th>Rango</th></tr></thead>
-          <tbody>${filtered.map(p => `
-            <tr>
-              <td><img src="${p.shield||''}" class="team-shield-mini"/> ${p.name}</td>
-              <td>${p.teamName}</td>
-              <td>${p.pig.toFixed(1)}</td>
-              <td>${formatCurrency(p.marketValue||0)}</td>
-              <td style="color:${rankColor(p.rocketRank)}">${p.rocketRank||'Platino'}</td>
-            </tr>
-          `).join('')}</tbody>
-        </table>`;
-      }
+      });
+    });
+    if (allPlayers.length === 0) return '<div class="empty-state"><i class="fa-solid fa-users-slash"></i>No hay jugadores con estadísticas.</div>';
 
-      // 8. Movimientos Económicos
-      views['economia'] = function() {
-        if (!economyLogs.length) return '<p class="empty">No hay movimientos económicos.</p>';
-        const grouped = {};
-        economyLogs.forEach(log => {
-          if (!grouped[log.teamId]) grouped[log.teamId] = [];
-          grouped[log.teamId].push(log);
+    // Funciones auxiliares para tablas
+    function makeTable(title, key, label, limit = 10) {
+      const sorted = [...allPlayers].sort((a,b) => (b[key] || 0) - (a[key] || 0)).slice(0, limit);
+      if (sorted.length === 0) return '';
+      let html = `<div class="card"><div class="card-header">${title}</div><div class="table-wrap"><table><thead><tr><th>#</th><th>Jugador</th><th>Equipo</th><th>${label}</th></tr></thead><tbody>`;
+      sorted.forEach((p, i) => {
+        html += `<tr><td>${i+1}</td><td class="flex-center"><img src="${p.teamShield || ''}" class="shield-sm"> ${p.name}</td><td>${p.teamName}</td><td><strong>${p[key] || 0}</strong></td></tr>`;
+      });
+      html += '</tbody></table></div></div>';
+      return html;
+    }
+
+    // Goleo
+    let html = makeTable('⚽ Goleadores', 'goals', 'Goles');
+    html += makeTable('🎯 Asistencias', 'assists', 'Asistencias');
+    html += makeTable('🧤 Salvadas', 'saves', 'Salvadas');
+    html += makeTable('💀 Tiros (Peligro)', 'shots', 'Tiros');
+
+    // MVPs por jornada (simulados a partir de stats de partidos)
+    // Si hay rondas, podemos calcular el MVP de cada jornada (el que más PIG sumó en esa jornada)
+    // Para simplificar, mostramos los jugadores con mayor PIG por jornada (si hay datos)
+    if (torneo.rounds && torneo.rounds.length > 0) {
+      html += `<div class="card"><div class="card-header">⭐ MVPs por Jornada</div>`;
+      torneo.rounds.forEach((round, idx) => {
+        // Recolectar stats de partidos de esta jornada
+        const statsMap = {};
+        round.forEach(m => {
+          if (m.stats) {
+            m.stats.forEach(st => {
+              if (!statsMap[st.pId]) statsMap[st.pId] = { g:0, a:0, s:0, t:0, pig:0 };
+              statsMap[st.pId].g += st.g || 0;
+              statsMap[st.pId].a += st.a || 0;
+              statsMap[st.pId].s += st.s || 0;
+              statsMap[st.pId].t += st.t || 0;
+              // PIG aproximado (usando multiplicadores por defecto)
+              const pig = (st.g||0)*2 + (st.a||0)*1.5 + (st.s||0)*1 + ((st.t||0) - (st.g||0))*0.2;
+              statsMap[st.pId].pig += pig;
+            });
+          }
         });
-        let html = '';
-        Object.keys(grouped).forEach(teamId => {
-          const team = teams.find(t => t.id === teamId);
-          if (!team) return;
-          const logs = grouped[teamId].sort((a,b) => b.date - a.date);
-          html += `<div class="economy-team">
-            <div class="economy-header" onclick="this.nextElementSibling.classList.toggle('hidden')">
-              <img src="${team.shield||''}" class="team-shield-mini"/> ${team.name}
-              <span>💰 ${formatCurrency(team.budget||0)}</span>
-              <i class="fas fa-chevron-down"></i>
-            </div>
-            <div class="economy-logs">
-              ${logs.map(log => {
-                const sign = log.amount > 0 ? '+' : '';
-                const cls = log.amount > 0 ? 'positive' : 'negative';
-                const icon = log.type === 'bonus' ? '🏆' : log.type === 'penalty' ? '⚠️' : '📌';
-                return `<div class="economy-log">
-                  <span class="icon">${icon}</span>
-                  <span class="desc">${log.description}</span>
-                  <span class="amount ${cls}">${sign}${formatCurrency(log.amount)}</span>
-                  <span class="round">J${log.round}</span>
-                </div>`;
-              }).join('')}
-            </div>
-          </div>`;
-        });
-        return html;
-      };
-
-      // 9. Sanciones
-      views['sanciones'] = function() {
-        if (!sanctionsLog.length) return '<p class="empty">No hay sanciones activas.</p>';
-        const activas = sanctionsLog.filter(s => s.active);
-        if (!activas.length) return '<p class="empty">No hay sanciones activas.</p>';
-        let html = `<div class="sanciones-list">`;
-        activas.forEach(s => {
-          html += `<div class="sanction-card ${s.type}">
-            <div class="sanction-header">
-              <span class="icon">${s.type === 'yellow' ? '🟨' : s.type === 'red' ? '🟥' : s.type === 'suspension' ? '🚫' : '💰'}</span>
-              <span class="player">${s.playerName}</span>
-              <span class="team">${s.teamName}</span>
-              <span class="type">${s.type}</span>
-            </div>
-            <div class="sanction-body">
-              <span class="reason">${s.reason}</span>
-              <span class="rounds">J${s.roundStart} ${s.roundEnd ? '- J'+s.roundEnd : ''}</span>
-            </div>
-          </div>`;
-        });
-        html += `</div>`;
-        return html;
-      };
-
-      // 10. Selección Nacional
-      views['seleccion'] = function() {
-        let sel = nationalTeams.find(nt => nt.type === 'main');
-        if (!sel) sel = nationalTeams.find(nt => nt.type === 'sub');
-        if (!sel) return '<p class="empty">No hay selección nacional ni sub selecciones.</p>';
-        const players = sel.players || [];
-        const logo = sel.logo || '';
-        const name = sel.name || 'Selección Nacional';
-        const stats = sel.stats || { goals: 0, assists: 0, saves: 0, pig: 0 };
-
-        let html = `<div class="seleccion-card">
-          <div class="seleccion-header">
-            <img src="${logo}" class="seleccion-logo" alt=""/>
-            <div>
-              <h3>${name}</h3>
-              <p>${players.length} jugadores convocados</p>
-              <div class="seleccion-stats">
-                <span>⚽ ${stats.goals||0}</span>
-                <span>🎯 ${stats.assists||0}</span>
-                <span>🧤 ${stats.saves||0}</span>
-                <span>📈 ${stats.pig||0}</span>
-              </div>
-            </div>
-          </div>
-          <div class="seleccion-jugadores">
-            ${players.map(p => `
-              <div class="seleccion-jugador">
-                <span>${p.name}</span>
-                <span class="role">${p.role||''}</span>
-                <span class="stats">⚽${p.stats?.goals||0} 🎯${p.stats?.assists||0} 🧤${p.stats?.saves||0}</span>
-              </div>
-            `).join('')}
-          </div>
-        </div>`;
-        return html;
-      };
-
-      // -------- NAVEGACIÓN Y RENDER --------
-      const container = document.getElementById('view-container');
-      const title = document.getElementById('view-title');
-      const navLinks = $$('#sidebar-nav a');
-
-      function renderView(viewId) {
-        const renderFn = views[viewId];
-        if (!renderFn) {
-          container.innerHTML = '<p class="empty">Vista no disponible.</p>';
+        const entries = Object.entries(statsMap);
+        if (entries.length === 0) {
+          html += `<div style="font-size:0.7rem;color:var(--color-text-muted);">Jornada ${idx+1}: Sin datos</div>`;
           return;
         }
-        container.innerHTML = renderFn();
-        // Aplicar eventos a los tabs de stats
-        if (viewId === 'stats') {
-          $$('.stats-tab').forEach(btn => {
-            btn.addEventListener('click', function() {
-              $$('.stats-tab').forEach(b => b.classList.remove('active'));
-              this.classList.add('active');
-              const target = this.dataset.tab;
-              $$('.stats-panel').forEach(p => p.classList.add('hidden'));
-              const panel = document.getElementById('stats-'+target);
-              if (panel) panel.classList.remove('hidden');
-            });
+        let best = null;
+        let bestPig = -1;
+        entries.forEach(([pid, st]) => {
+          if (st.pig > bestPig) {
+            bestPig = st.pig;
+            best = pid;
+          }
+        });
+        if (best) {
+          // Buscar nombre
+          let name = '?';
+          let teamName = '';
+          for (let team of torneo.teams) {
+            const p = team.players.find(x => x.id === best);
+            if (p) { name = p.name; teamName = team.name; break; }
+          }
+          html += `<div style="font-size:0.7rem;padding:0.2rem 0;border-bottom:1px solid var(--color-border);">Jornada ${idx+1}: <strong>${name}</strong> (${teamName}) — ${bestPig.toFixed(1)} PIG</div>`;
+        } else {
+          html += `<div style="font-size:0.7rem;color:var(--color-text-muted);">Jornada ${idx+1}: Sin MVP</div>`;
+        }
+      });
+      html += '</div>';
+    }
+
+    return html;
+  }
+
+  // ---------- BALÓN DE ORO ----------
+  function renderBalon(torneo) {
+    const allPlayers = [];
+    torneo.teams.forEach(team => {
+      team.players.forEach(p => {
+        if (p.name && p.name.trim() !== '') {
+          const s = p.seasonStats || { pig:0 };
+          allPlayers.push({
+            ...p,
+            teamName: team.name,
+            teamShield: team.shield,
+            pig: s.pig || 0
           });
         }
-        if (viewId === 'mercado') {
-          const equipoSelect = document.getElementById('filtro-equipo');
-          const ordenSelect = document.getElementById('filtro-orden');
-          const buscarInput = document.getElementById('filtro-buscar');
-          const containerTabla = document.getElementById('mercado-tabla-container');
-          function actualizarMercado() {
-            const filtros = {
-              equipo: equipoSelect ? equipoSelect.value : 'all',
-              orden: ordenSelect ? ordenSelect.value : 'price-desc',
-              buscar: buscarInput ? buscarInput.value : ''
-            };
-            const allPlayers = teams.flatMap(t => t.players.map(p => ({
-              ...p,
-              teamName: t.name,
-              teamId: t.id,
-              shield: t.shield,
-              pig: p.seasonStats?.pig || 0
-            }))).filter(p => p.name && p.name.trim());
-            containerTabla.innerHTML = renderMercadoTabla(allPlayers, filtros);
-          }
-          if (equipoSelect) equipoSelect.addEventListener('change', actualizarMercado);
-          if (ordenSelect) ordenSelect.addEventListener('change', actualizarMercado);
-          if (buscarInput) buscarInput.addEventListener('input', actualizarMercado);
-          actualizarMercado();
+      });
+    });
+    if (allPlayers.length === 0) return '<div class="empty-state"><i class="fa-solid fa-trophy"></i>Sin jugadores.</div>';
+    const sorted = [...allPlayers].sort((a,b) => (b.pig || 0) - (a.pig || 0));
+
+    let html = '<div class="podium">';
+    const top3 = sorted.slice(0,3);
+    const podiumClasses = ['first','second','third'];
+    top3.forEach((p, i) => {
+      html += `
+        <div class="podium-item ${podiumClasses[i]}" style="width:80px;">
+          <div class="pos">#${i+1}</div>
+          <img src="${p.teamShield || ''}" style="width:1.8rem;height:1.8rem;border-radius:50%;background:#000;border:1px solid var(--color-border);object-fit:contain;">
+          <div class="name">${p.name}</div>
+          <div class="value">${(p.pig || 0).toFixed(1)}</div>
+        </div>
+      `;
+    });
+    html += '</div>';
+
+    // Resto de la tabla
+    html += `<div class="table-wrap"><table><thead><tr><th>#</th><th>Jugador</th><th>Equipo</th><th>PIG</th></tr></thead><tbody>`;
+    sorted.slice(3).forEach((p, i) => {
+      html += `<tr><td>${i+4}</td><td class="flex-center"><img src="${p.teamShield || ''}" class="shield-sm"> ${p.name}</td><td>${p.teamName}</td><td>${(p.pig || 0).toFixed(1)}</td></tr>`;
+    });
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+  // ---------- EQUIPOS ----------
+  function renderEquipos(torneo) {
+    if (!torneo.teams || torneo.teams.length === 0) return '<div class="empty-state"><i class="fa-solid fa-users-slash"></i>No hay equipos.</div>';
+    let html = '';
+    torneo.teams.forEach(team => {
+      const titulares = team.players.filter(p => p.role === 'Titular 🌟' && p.name && p.name.trim() !== '');
+      const suplentes = team.players.filter(p => p.role === 'Suplente 🔄' && p.name && p.name.trim() !== '');
+      const reservas = team.players.filter(p => p.role === 'Reserva 💤' && p.name && p.name.trim() !== '');
+      const capitan = team.players.find(p => p.isCaptain);
+
+      html += `
+        <div class="card">
+          <div class="flex-center" style="justify-content:space-between;flex-wrap:wrap;">
+            <div class="flex-center">
+              <img src="${team.shield || ''}" style="width:2.5rem;height:2.5rem;border-radius:50%;background:#000;border:1px solid var(--color-border);object-fit:contain;">
+              <div>
+                <strong style="font-size:1rem;">${team.name}</strong>
+                <div style="font-size:0.6rem;color:var(--color-text-muted);">
+                  GLB ${team.glb || 0} · ATK ${team.atk || 0} · DEF ${team.def || 0} · Presupuesto ${formatCurrency(team.budget || 0)}
+                  ${capitan ? ` · Capitán: ${capitan.name}` : ''}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:0.5rem;">
+            <div style="font-size:0.6rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.05em;">Titulares</div>
+            <div class="player-list">${titulares.map(p => `<span class="player-tag titular ${p.isCaptain ? 'captain' : ''}">${p.isCaptain ? '👑 ' : ''}${p.name}</span>`).join('') || '<span class="text-muted" style="font-size:0.6rem;">Ninguno</span>'}</div>
+            <div style="font-size:0.6rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-top:0.3rem;">Suplentes</div>
+            <div class="player-list">${suplentes.map(p => `<span class="player-tag suplente">${p.name}</span>`).join('') || '<span class="text-muted" style="font-size:0.6rem;">Ninguno</span>'}</div>
+            <div style="font-size:0.6rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-top:0.3rem;">Reservas (FB)</div>
+            <div class="player-list">${reservas.map(p => `<span class="player-tag reserva">${p.name}</span>`).join('') || '<span class="text-muted" style="font-size:0.6rem;">Ninguno</span>'}</div>
+          </div>
+        </div>
+      `;
+    });
+    return html;
+  }
+
+  // ---------- MERCADO ----------
+  function renderMercado(torneo) {
+    // Obtener todos los jugadores con sus precios
+    const allPlayers = [];
+    torneo.teams.forEach(team => {
+      team.players.forEach(p => {
+        if (p.name && p.name.trim() !== '') {
+          const s = p.seasonStats || { pig:0 };
+          allPlayers.push({
+            ...p,
+            teamId: team.id,
+            teamName: team.name,
+            teamShield: team.shield,
+            pig: s.pig || 0,
+            marketValue: p.marketValue || 0,
+            rocketRank: p.rocketRank || 'Platino',
+            division: p.division || 2
+          });
         }
-        const link = navLinks.find(a => a.dataset.view === viewId);
-        if (link) title.textContent = link.textContent.trim();
-        else title.textContent = viewId;
-        if (window.innerWidth < 768) {
-          document.getElementById('sidebar').classList.remove('open');
-        }
+      });
+    });
+    if (allPlayers.length === 0) return '<div class="empty-state"><i class="fa-solid fa-store-slash"></i>No hay jugadores en el mercado.</div>';
+
+    // Construir filtros
+    const teamsOpts = torneo.teams.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+
+    // Inyectar filtros y tabla
+    let html = `
+      <div class="filters">
+        <select id="mercadoEquipo"><option value="all">Todos los equipos</option>${teamsOpts}</select>
+        <select id="mercadoOrden">
+          <option value="precio-desc">Precio ↓</option>
+          <option value="precio-asc">Precio ↑</option>
+          <option value="pig-desc">PIG ↓</option>
+          <option value="pig-asc">PIG ↑</option>
+          <option value="nombre">Nombre A-Z</option>
+          <option value="nombre-desc">Nombre Z-A</option>
+        </select>
+        <input id="mercadoBuscar" type="text" placeholder="Buscar jugador..." style="flex:1;min-width:120px;">
+      </div>
+      <div id="mercadoTablaContainer"></div>
+    `;
+
+    // Función para renderizar tabla con filtros
+    function renderMercadoTabla() {
+      const equipo = document.getElementById('mercadoEquipo').value;
+      const orden = document.getElementById('mercadoOrden').value;
+      const busqueda = document.getElementById('mercadoBuscar').value.toLowerCase();
+
+      let filtered = allPlayers;
+      if (equipo !== 'all') filtered = filtered.filter(p => p.teamId === equipo);
+      if (busqueda) filtered = filtered.filter(p => p.name.toLowerCase().includes(busqueda));
+
+      switch (orden) {
+        case 'precio-desc': filtered.sort((a,b) => (b.marketValue||0) - (a.marketValue||0)); break;
+        case 'precio-asc': filtered.sort((a,b) => (a.marketValue||0) - (b.marketValue||0)); break;
+        case 'pig-desc': filtered.sort((a,b) => (b.pig||0) - (a.pig||0)); break;
+        case 'pig-asc': filtered.sort((a,b) => (a.pig||0) - (b.pig||0)); break;
+        case 'nombre': filtered.sort((a,b) => a.name.localeCompare(b.name)); break;
+        case 'nombre-desc': filtered.sort((a,b) => b.name.localeCompare(a.name)); break;
+        default: break;
       }
 
-      // Eventos de navegación
-      navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-          e.preventDefault();
-          const view = this.dataset.view;
-          if (view) renderView(view);
-        });
-      });
+      if (filtered.length === 0) {
+        document.getElementById('mercadoTablaContainer').innerHTML = '<div class="empty-state"><i class="fa-solid fa-search"></i>No se encontraron jugadores.</div>';
+        return;
+      }
 
-      // Menú hamburguesa
-      document.getElementById('menu-toggle').addEventListener('click', function() {
-        document.getElementById('sidebar').classList.toggle('open');
+      let tabla = `<div class="table-wrap"><table><thead><tr><th>Jugador</th><th>Equipo</th><th>PIG</th><th>Rango</th><th>Precio</th></tr></thead><tbody>`;
+      filtered.forEach(p => {
+        const rankDisplay = p.rocketRank + (p.rocketRank !== 'SSL' ? ` Div${p.division}` : '');
+        tabla += `
+          <tr>
+            <td class="flex-center"><img src="${p.teamShield || ''}" class="shield-sm"> ${p.name} ${p.isCaptain ? '👑' : ''}</td>
+            <td>${p.teamName}</td>
+            <td>${(p.pig || 0).toFixed(1)}</td>
+            <td style="color:${getRankColor(p.rocketRank)};font-weight:700;">${rankDisplay}</td>
+            <td>${formatCurrency(p.marketValue || 0)}</td>
+          </tr>
+        `;
       });
+      tabla += '</tbody></table></div>';
+      document.getElementById('mercadoTablaContainer').innerHTML = tabla;
+    }
 
-      // Cerrar sidebar al hacer clic fuera (móvil)
-      document.addEventListener('click', function(e) {
-        const sidebar = document.getElementById('sidebar');
-        const toggle = document.getElementById('menu-toggle');
-        if (window.innerWidth < 768 && sidebar.classList.contains('open') &&
-            !sidebar.contains(e.target) && !toggle.contains(e.target)) {
+    // Añadir eventos después de renderizar
+    setTimeout(() => {
+      document.getElementById('mercadoEquipo').addEventListener('change', renderMercadoTabla);
+      document.getElementById('mercadoOrden').addEventListener('change', renderMercadoTabla);
+      document.getElementById('mercadoBuscar').addEventListener('input', renderMercadoTabla);
+      renderMercadoTabla();
+    }, 0);
+
+    return html;
+  }
+
+  // ---------- MOVIMIENTOS ECONÓMICOS ----------
+  function renderEconomia(torneo) {
+    if (!torneo.economyLogs || torneo.economyLogs.length === 0) {
+      return '<div class="empty-state"><i class="fa-solid fa-coins"></i>No hay movimientos económicos registrados.</div>';
+    }
+    const logs = [...torneo.economyLogs].reverse(); // más reciente primero
+    let html = `<div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Equipo</th><th>Descripción</th><th>Monto</th></tr></thead><tbody>`;
+    logs.forEach(log => {
+      const team = torneo.teams.find(t => t.id === log.teamId);
+      const teamName = team ? team.name : 'Desconocido';
+      const teamShield = team ? team.shield : '';
+      const isIncome = log.amount > 0;
+      const sign = isIncome ? '+' : '';
+      const color = isIncome ? 'var(--neon-green)' : 'var(--neon-red)';
+      const date = new Date(log.date).toLocaleDateString('es-ES');
+      html += `
+        <tr>
+          <td style="font-size:0.6rem;">${date}</td>
+          <td class="flex-center"><img src="${teamShield}" class="shield-sm"> ${teamName}</td>
+          <td>${log.description}</td>
+          <td style="color:${color};font-weight:700;">${sign}${formatCurrency(log.amount)}</td>
+        </tr>
+      `;
+    });
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+  // ---------- SANCIONES ----------
+  function renderSanciones(torneo) {
+    if (!torneo.sanctionsLog || torneo.sanctionsLog.length === 0) {
+      return '<div class="empty-state"><i class="fa-solid fa-gavel"></i>No hay sanciones registradas.</div>';
+    }
+    const logs = [...torneo.sanctionsLog].filter(s => s.active !== false).reverse();
+    if (logs.length === 0) return '<div class="empty-state"><i class="fa-solid fa-check-circle" style="color:var(--neon-green);"></i>No hay sanciones activas.</div>';
+
+    let html = `<div class="table-wrap"><table><thead><tr><th>Jugador</th><th>Equipo</th><th>Tipo</th><th>Motivo</th><th>Jornadas</th></tr></thead><tbody>`;
+    logs.forEach(s => {
+      const team = torneo.teams.find(t => t.id === s.teamId);
+      const teamName = team ? team.name : 'Desconocido';
+      const teamShield = team ? team.shield : '';
+      const typeLabel = s.type === 'yellow' ? '🟨 Amonestación' : s.type === 'red' ? '🟥 Expulsión' : s.type === 'suspension' ? '🚫 Suspensión' : '💰 Multa';
+      const rounds = s.roundEnd ? `J${s.roundStart} - J${s.roundEnd}` : `Desde J${s.roundStart}`;
+      html += `
+        <tr>
+          <td><strong>${s.playerName}</strong></td>
+          <td class="flex-center"><img src="${teamShield}" class="shield-sm"> ${teamName}</td>
+          <td>${typeLabel}</td>
+          <td>${s.reason}</td>
+          <td>${rounds}</td>
+        </tr>
+      `;
+    });
+    html += '</tbody></table></div>';
+    return html;
+  }
+
+  // ---------- SELECCIÓN NACIONAL ----------
+  function renderSeleccion(torneo) {
+    // Buscar selección nacional (type === 'main') o la primera sub
+    let national = null;
+    if (torneo.nationalTeams) {
+      national = torneo.nationalTeams.find(nt => nt.type === 'main');
+      if (!national) national = torneo.nationalTeams[0];
+    }
+    if (!national || !national.players || national.players.length === 0) {
+      return '<div class="empty-state"><i class="fa-solid fa-flag"></i>No hay selección nacional configurada.</div>';
+    }
+
+    // Mostrar los jugadores convocados (tridente)
+    let html = `
+      <div class="card">
+        <div class="flex-center" style="justify-content:space-between;">
+          <span style="font-family:'Montserrat',sans-serif;font-weight:900;font-size:1.2rem;">${national.name}</span>
+          <span style="font-size:0.7rem;color:var(--color-text-muted);">${national.type === 'main' ? '🇲🇽 Selección Nacional' : '🔵 Sub Selección'}</span>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:1rem;margin-top:0.5rem;justify-content:center;">
+    `;
+    // Mostrar cada jugador
+    national.players.forEach(p => {
+      const rankColor = getRankColor(p.rocketRank || 'Platino');
+      html += `
+        <div style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius);padding:0.6rem;text-align:center;min-width:100px;flex:1 0 auto;max-width:140px;">
+          <div style="font-size:0.6rem;color:var(--color-text-muted);">${p.role || 'Jugador'}</div>
+          <img src="${p.shield || ''}" style="width:2.5rem;height:2.5rem;border-radius:50%;background:#000;border:1px solid var(--color-border);object-fit:contain;margin:0.2rem auto;">
+          <div style="font-weight:700;font-size:0.75rem;">${p.name}</div>
+          <div style="font-size:0.6rem;color:${rankColor};">${p.rocketRank || 'Platino'} ${p.division && p.rocketRank !== 'SSL' ? `Div${p.division}` : ''}</div>
+          <div style="font-size:0.65rem;color:var(--neon-yellow);">G${p.stats?.goals||0} A${p.stats?.assists||0} S${p.stats?.saves||0}</div>
+        </div>
+      `;
+    });
+    html += '</div></div>';
+
+    // Mostrar poder de la selección
+    const power = { atk: national.atk || 0, def: national.def || 0, glb: national.glb || 0 };
+    html += `
+      <div class="card" style="margin-top:0.5rem;">
+        <div class="flex-center" style="gap:1rem;flex-wrap:wrap;">
+          <span><span class="power-badge atk">ATK ${power.atk}</span></span>
+          <span><span class="power-badge def">DEF ${power.def}</span></span>
+          <span><span class="power-badge glb">GLB ${power.glb}</span></span>
+          <span style="font-size:0.7rem;color:var(--color-text-muted);">Partidos: ${national.matchesPlayed || 0}</span>
+        </div>
+      </div>
+    `;
+    return html;
+  }
+
+  // ==========================================
+  // CONSTRUCCIÓN DE LA INTERFAZ
+  // ==========================================
+  function buildUI(torneo) {
+    // Generar menús
+    let navHtml = '';
+    MENU_ITEMS.forEach(item => {
+      navHtml += `
+        <div class="nav-item" data-section="${item.id}">
+          <i class="fas ${item.icon}"></i> ${item.label}
+        </div>
+      `;
+    });
+    mainNav.innerHTML = navHtml;
+
+    // Generar secciones
+    let sectionsHtml = '';
+    MENU_ITEMS.forEach(item => {
+      let content = '';
+      switch (item.id) {
+        case 'tabla': content = renderTabla(torneo); break;
+        case 'media': content = renderMedia(torneo); break;
+        case 'jornadas': content = renderJornadas(torneo); break;
+        case 'playoffs': content = renderPlayoffs(torneo); break;
+        case 'stats': content = renderStats(torneo); break;
+        case 'balon': content = renderBalon(torneo); break;
+        case 'equipos': content = renderEquipos(torneo); break;
+        case 'mercado': content = renderMercado(torneo); break;
+        case 'economia': content = renderEconomia(torneo); break;
+        case 'sanciones': content = renderSanciones(torneo); break;
+        case 'seleccion': content = renderSeleccion(torneo); break;
+        default: content = '<div class="empty-state">Sección no implementada</div>';
+      }
+      sectionsHtml += `
+        <div class="section" id="section-${item.id}">
+          <div class="section-title"><i class="fas ${item.icon}"></i> ${item.label}</div>
+          ${content}
+        </div>
+      `;
+    });
+    sectionsContainer.innerHTML = sectionsHtml;
+
+    // Eventos de navegación
+    document.querySelectorAll('.nav-item').forEach(el => {
+      el.addEventListener('click', function() {
+        const sectionId = this.dataset.section;
+        switchSection(sectionId);
+        // Cerrar sidebar en móvil
+        if (window.innerWidth <= 820) {
           sidebar.classList.remove('open');
         }
       });
+    });
 
-      // Cargar vista inicial
-      renderView('tabla-general');
-    }
+    // Mostrar sección inicial
+    switchSection('tabla');
+  }
 
-    // ============================================
-    // INICIO DE LA APLICACIÓN
-    // ============================================
-    
-    // Si los datos ya están cargados (por ejemplo, si se usó datos de ejemplo)
-    if (window.torneoData) {
-      torneoData = window.torneoData;
-      iniciarVisor();
-    } else {
-      // Cargar desde JSON
-      cargarDatos();
+  function switchSection(id) {
+    // Ocultar todas
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    // Mostrar la seleccionada
+    const target = document.getElementById('section-' + id);
+    if (target) target.classList.add('active');
+    // Actualizar menú
+    document.querySelectorAll('.nav-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.section === id);
+    });
+    currentSection = id;
+  }
+
+  // ==========================================
+  // CARGA DE DATOS
+  // ==========================================
+  async function loadData() {
+    try {
+      const resp = await fetch('datos.json');
+      if (!resp.ok) throw new Error('No se pudo cargar datos.json');
+      const raw = await resp.json();
+      // El JSON puede ser un torneo directamente o un objeto con torneos
+      // En MTM se exporta el torneo completo, asumimos que es el objeto torneo.
+      // Si tiene propiedad 'tournaments', tomamos el primero.
+      let torneo = raw;
+      if (raw.tournaments && Array.isArray(raw.tournaments) && raw.tournaments.length > 0) {
+        torneo = raw.tournaments[0];
+      }
+      data = torneo;
+      buildUI(torneo);
+    } catch (err) {
+      console.error(err);
+      sectionsContainer.innerHTML = `
+        <div class="empty-state" style="padding:3rem 1rem;">
+          <i class="fa-solid fa-triangle-exclamation" style="font-size:3rem;color:var(--neon-red);"></i>
+          <p style="font-size:1rem;margin-top:1rem;">Error al cargar los datos.</p>
+          <p style="font-size:0.8rem;color:var(--color-text-muted);">Asegúrate de que el archivo <strong>datos.json</strong> esté en la misma carpeta y sea un JSON válido.</p>
+          <p style="font-size:0.7rem;color:var(--color-text-muted);">${err.message}</p>
+        </div>
+      `;
     }
-  </script>
+  }
+
+  // ==========================================
+  // EVENTOS DEL SIDEBAR (móvil)
+  // ==========================================
+  hamburgerBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+  });
+
+  // Cerrar sidebar al hacer clic fuera
+  document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 820) {
+      if (!sidebar.contains(e.target) && e.target !== hamburgerBtn && !hamburgerBtn.contains(e.target)) {
+        sidebar.classList.remove('open');
+      }
+    }
+  });
+
+  // ==========================================
+  // INICIO
+  // ==========================================
+  loadData();
+</script>
+
 </body>
 </html>
